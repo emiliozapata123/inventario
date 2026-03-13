@@ -143,6 +143,7 @@ ALLOWED_HOSTS = [
     '192.168.8.103',
     '.loca.lt',          
     'mi-back.loca.lt',
+    'inventario-back-end.onrender.com'
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
