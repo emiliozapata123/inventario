@@ -55,6 +55,7 @@ class ProfileView(APIView):
                 return Response({"error":"debe existir al menos un usuario en el sistema"})
             
             profile.user.delete()
+            return Response({"mensaje","usuario eliminado"}, status=status.HTTP_204_NO_CONTENT)
         
         except Profile.DoesNotExist:
             return Response({"error":"usuario no encontrado"},status=status.HTTP_404_NOT_FOUND)
