@@ -88,7 +88,6 @@ class BodegaInventario(APIView):
         return Response(data, status=status.HTTP_200_OK) 
         
 class ProductoView(APIView):
-    permission_classes = [IsAuthenticated]
     
     def get(self,request):
         productos = Producto.objects.all()
