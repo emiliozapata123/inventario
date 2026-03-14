@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CustomTokenObtainPairView,ProfileView,UserView,CurrentUserView
+from .views import CustomTokenObtainPairView,ProfileView,UserView,CurrentUserView,UserProfileCreateAPIView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 
@@ -10,6 +10,10 @@ urlpatterns = [
     path('profile/form/',ProfileView.as_view()),
     path('user/update/',UserView.as_view()),
     path('current-user/',CurrentUserView.as_view()),    
-    path('profile/<int:id>/delete/',ProfileView.as_view()),    
+    path('profile/<int:id>/delete/',ProfileView.as_view()), 
+    
+
+
+    path("create-user/", UserProfileCreateAPIView.as_view(), name="create-user"),   
 
 ]

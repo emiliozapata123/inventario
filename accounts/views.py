@@ -30,7 +30,6 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     
 class ProfileView(APIView):
-    permission_classes = [IsAuthenticated]
     def get(self, request):
         usuarios = Profile.objects.all()
         serializer = ProfileSerializer(usuarios, many=True)
@@ -85,4 +84,72 @@ class CurrentUserView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
         
     
+# views.py
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth.models import User
+from .models import Profile  # y Rol si lo usas
+from .serializers import ProfileWriteSerializer
+import threading
+from .serializers import generarPassword, enviarCorreo  # usa tus funciones existentes
+
+class UserProfileCreateAPIView(APIView):
+    """
+    API para crear un usuario y su profile automáticamente.
+    Recibe:
+    - nombre
+    - correo
+    - rol (opcional)
+    """
     
+    def post(self, request):
+        nombre = request.data.get("nombre")
+        correo = request.data.get("correo")
+        rol_id = request.data.get("rol", None)  # si quieres usar rol
+        
+        if not nombre or not correo:
+            return Response(
+                {"error": "Debe enviar nombre y correo"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Generamos contraseña aleatoria
+        password = generarPassword()
+        
+        # Generamos username desde el correo
+        username = correo.split("@")[0]
+        
+        if User.objects.filter(username=username).exists():
+            return Response(
+                {"error": "Usuario ya existe"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Crear el User
+        user = User.objects.create_user(username=username, password=password)
+        
+        # Crear Profile
+        profile_data = {"user": user, "nombre": nombre, "correo": correo}
+        Profile.objects.create(**profile_data)
+        
+        # Enviar correo en hilo separado
+        threading.Thread(
+            target=enviarCorreo,
+            args=(nombre, correo, password),
+            daemon=True
+        ).start()
+        
+        # Retornamos datos básicos
+        return Response(
+            {
+                "message": "Usuario creado correctamente",
+                "usuario": {
+                    "username": username,
+                    "nombre": nombre,
+                    "correo": correo,
+                    "password_temporal": password  # opcional mostrar solo para testing
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
