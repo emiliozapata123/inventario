@@ -7,6 +7,7 @@ import threading
 from django.core.mail import send_mail
 import secrets
 import string
+from django.conf import settings
 
 def generarPassword(len=10):
     caracteres = string.ascii_letters + string.digits + string.punctuation
@@ -34,7 +35,7 @@ def enviarCorreo(nombre,correo,password):
     send_mail(
         asunto,
         mensaje,
-        "no-reply@otecprocapacita.com",
+        settings.EMAIL_HOST_USER,
         [correo],
         fail_silently=False,
     )
