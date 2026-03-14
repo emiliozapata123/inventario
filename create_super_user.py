@@ -1,20 +1,20 @@
-from django.db import migrations
-from django.contrib.auth.models import User
 import os
+import django
 
-def create_admin(apps, schema_editor):
-    username = os.environ.get("SUPERUSER_NAME", "admin")
-    email = os.environ.get("SUPERUSER_EMAIL", "admin@example.com")
-    password = os.environ.get("SUPERUSER_PASSWORD", "12345678")
-    if not User.objects.filter(username=username).exists():
-        User.objects.create_superuser(username=username, email=email, password=password)
+# 1️⃣ Define la configuración
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_inventario.settings")
+django.setup()
 
-class Migration(migrations.Migration):
+# 2️⃣ Ahora sí puedes importar User
+from django.contrib.auth.models import User
 
-    dependencies = [
-        ('accounts', '0001_initial'),  # la nueva inicial
-    ]
+# Datos del superusuario
+USERNAME = os.environ.get("SUPERUSER_NAME", "admin")
+EMAIL = os.environ.get("SUPERUSER_EMAIL", "admin@example.com")
+PASSWORD = os.environ.get("SUPERUSER_PASSWORD", "12345678")
 
-    operations = [
-        migrations.RunPython(create_admin),
-    ]
+if not User.objects.filter(username=USERNAME).exists():
+    User.objects.create_superuser(USERNAME, EMAIL, PASSWORD)
+    print("Superuser creado correctamente")
+else:
+    print("El superuser ya existe")
