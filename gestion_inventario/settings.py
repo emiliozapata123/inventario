@@ -17,7 +17,8 @@ DEBUG = os.environ.get("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'inventario-back-end.onrender.com',
+    "inventariobackend-va4r.onrender.com",
+
 ]
 
 # ----------------------------------------
