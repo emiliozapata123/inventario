@@ -1,8 +1,5 @@
-from django.db import models
-from django.contrib.auth.models import User
-
-# Create your models here.
 from django.db import migrations
+from django.contrib.auth.models import User
 
 def create_admin(apps, schema_editor):
     if not User.objects.filter(username='admin').exists():
@@ -17,10 +14,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(create_admin),
     ]
-    
-class Profile(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile")
-    nombre=models.CharField(max_length=100)
-    correo=models.EmailField()
-
-    
