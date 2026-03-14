@@ -18,7 +18,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    "emiliozapata.pythonanywhere.com"
+    "gestioninventario.pythonanywhere.com"
 
 ]
 
