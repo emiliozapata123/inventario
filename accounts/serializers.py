@@ -76,55 +76,9 @@ class ProfileWriteSerializer(serializers.ModelSerializer):
             daemon=True
         ).start()
         return user
-        
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ""
-        
-#     def create(self, validated_data):
-#         request = self.context.data.get("request")
-#         password = generarPassword()
-#         nombre = request.data.get("nombre")
-#         correo = request.data.get("correo")
-#         rolID = request.data.get("rol")
-        
-#         username = correo.split("@")[0]
-#         user = User.objects.create_user(
-#             username=username,
-#             password=password
-#         )
-#         rol = Rol.objects.get(pk=rolID)
-#         Profile.objects.create(
-#             user=user,
-#             rol=rol,
-#             nombre=nombre,
-#             correo=correo
-#         )
-#         threading.Thread(
-#             target=enviarCorreo,
-#             args=(nombre,
-#             correo,
-#             password,
-#             ),
-#             daemon=True
-#         ).start()
-#         return user
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        # correo = attrs.get("username")
-        # password = attrs.get("password")
-        
-        # user = get_object_or_404(User,correo=correo)
-        # if not user.check_password(password):
-        #     raise serializers.ValidationError("Error, no se encontro usuario")
-        
-        # data = super().validate({"username":user.username,"password":password})
-        # serializer = UserSerializer(user)
-        # data["user"] = serializer.data
-        # return data
-    
         identificador = attrs.get("username")
         password = attrs.get("password")
         

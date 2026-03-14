@@ -19,6 +19,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     "inventariobackend-va4r.onrender.com",
+    "emiliozapata.pythonanywhere.com"
 
 ]
 
