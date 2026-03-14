@@ -240,6 +240,8 @@ class ActivoView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class ResumenActivo(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
 
         equipos = (
@@ -252,6 +254,8 @@ class ResumenActivo(APIView):
                 
     
 class ResumenInventario(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         inventario = Inventario.objects.all()
         
@@ -267,6 +271,8 @@ class ResumenInventario(APIView):
         return Response(diccionario, status=status.HTTP_200_OK)
     
 class AlertaInventario(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         inventario = Inventario.objects.all()
         
