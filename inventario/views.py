@@ -23,7 +23,6 @@ class BodegaView(APIView):
             diccionario = {
                 "id":bodega.id,
                 "nombre":bodega.nombre,
-                "ubicacion":bodega.ubicacion,
                 "totalItems":totalItems,
                 "totalProductos":bodega.inventario.count()
             }
@@ -71,7 +70,6 @@ class BodegaInventario(APIView):
         data = {
             "id":bodega.id,
             "bodega":bodega.nombre,
-            "ubicacion":bodega.ubicacion,
             "totalProductos":bodega.inventario.count(),
             "totalItems":0,
             "productos":[],
@@ -155,36 +153,50 @@ class InventarioView(APIView):
             fecha=fecha,
             bodega_id=bodega
         )
+        
+        movimientoCreado = 0
                
         for producto in productos:
             stockMinimo = producto.get("stockMinimo")
-            if producto["cantidad"] <= 0: 
+            cantidad = producto.get("cantidad")
+            
+            if cantidad <= 0: 
                 continue
+            
             try:
                 inventario = Inventario.objects.select_for_update().get(bodega_id=bodega,producto_id=producto["id"])
-                inventario.stock+=producto["cantidad"]
+                
+                inventario.stock+=cantidad
                 if stockMinimo is not None:
-                    inventario.stockMinimo=producto["stockMinimo"]
+                    inventario.stockMinimo=stockMinimo
                 inventario.save()
                
                 DetalleMovimiento.objects.create(
                     movimiento=movimiento,
                     producto_id=producto["id"],
-                    cantidad=producto["cantidad"]
+                    cantidad=cantidad
                 )
+                
+                movimientoCreado += 1
+                
             except Inventario.DoesNotExist:
-                Inventario.objects.get_or_create(
+                Inventario.objects.create(
                     bodega_id=bodega,
                     producto_id=producto["id"],
-                    stock=producto["cantidad"],
-                    stockMinimo=producto["stockMinimo"]
+                    stock=cantidad,
+                    stockMinimo=stockMinimo
                 )
               
                 DetalleMovimiento.objects.create(
                     movimiento=movimiento,
                     producto_id=producto["id"],
-                    cantidad=producto["cantidad"]
+                    cantidad=cantidad
                 )
+                movimientoCreado += 1
+                
+        if movimientoCreado == 0:
+            movimiento.delete()
+            return Response({"error":"no se registro el movimiento"}, status=status.HTTP_400_BAD_REQUEST)
                 
         return Response(status=status.HTTP_201_CREATED)
     
@@ -302,13 +314,14 @@ class MovimientoView(APIView):
             tipo="Salida",
             bodega_id=bodega
         )
-        
+        movimientoCreado = 0
         for producto in productos:
             if producto["cantidad"] <= 0:
                 continue
             try:
                 inventario = Inventario.objects.get(bodega_id=bodega,producto_id=producto["id"])
-                
+                if inventario.stock < producto["cantidad"]:
+                    continue
                 inventario.stock-=producto["cantidad"]
                 inventario.save()
                 
@@ -317,8 +330,16 @@ class MovimientoView(APIView):
                     producto_id=producto["id"],
                     cantidad=producto["cantidad"]
                 )
+                
+                movimientoCreado+=1
+                
             except Inventario.DoesNotExist:
-                return Response({"error":"no se encontro el producto"}, status=status.HTTP_404_NOT_FOUND)
+                continue
+            
+        if movimientoCreado == 0:
+            movimiento.delete()
+            return Response({"error":"no se registro el movimiento"}, status=status.HTTP_400_BAD_REQUEST)
+        
         return Response(status=status.HTTP_201_CREATED)
 
 class DetalleMovimientoView(APIView):

@@ -9,10 +9,14 @@ from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
 def validarPassword(password):
+    longitud = False
     numero = False
     mayuscula = False
     minuscula = False
     
+    if len(password) >= 8:
+        longitud = True
+        
     for letra in password:
         if "a" < letra < "z":
             minuscula = True
@@ -21,7 +25,7 @@ def validarPassword(password):
         if "0" < letra < "9":
             numero = True
             
-    if not numero or not mayuscula or not minuscula:
+    if not longitud or not numero or not mayuscula or not minuscula:
         return False
     return True
 
@@ -43,7 +47,7 @@ class ProfileView(APIView):
             return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def delete(self, request,id):
+    def delete(self, request, id):
         user = request.user
         try:
             profile = Profile.objects.get(pk=id)
@@ -52,7 +56,7 @@ class ProfileView(APIView):
                 return Response({"error":"no puedes eliminar tu propio usuario"}, status=status.HTTP_400_BAD_REQUEST)
             
             if User.objects.count() <= 1:
-                return Response({"error":"debe existir al menos un usuario en el sistema"})
+                return Response({"error":"debe existir al menos un usuario en el sistema"},status=status.HTTP_400_BAD_REQUEST)
             
             profile.user.delete()
             return Response({"mensaje","usuario eliminado"}, status=status.HTTP_204_NO_CONTENT)
@@ -64,6 +68,7 @@ class ProfileView(APIView):
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
+        passActual = request.data.get("actual")
         password = request.data.get("password")
         
         validar = validarPassword(password)
@@ -71,6 +76,9 @@ class UserView(APIView):
             return Response({"error","contraseña no valido"}, status=status.HTTP_400_BAD_REQUEST)
         
         user = request.user
+        
+        if passActual != user.password:
+            return Response({"error":"contrasena actual no coincide"},status=status.HTTP_400_BAD_REQUEST)
         
         user.set_password(password)
         user.save()
