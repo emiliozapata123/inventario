@@ -19,6 +19,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     "gestioninventario.pythonanywhere.com"
+    "gestioninventariofront.vercel.app"
 
 ]
 
@@ -122,8 +123,14 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # ----------------------------------------
 # CORS
+
 # ----------------------------------------
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://gestioninventariofront.vercel.app",
+]
 CORS_ALLOW_CREDENTIALS = True
 
 # ----------------------------------------

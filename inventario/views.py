@@ -316,19 +316,25 @@ class MovimientoView(APIView):
         )
         movimientoCreado = 0
         for producto in productos:
+            cantidad = producto.get("cantidad")
+            
             if producto["cantidad"] <= 0:
                 continue
             try:
                 inventario = Inventario.objects.get(bodega_id=bodega,producto_id=producto["id"])
-                if inventario.stock < producto["cantidad"]:
+                if inventario.stock < cantidad:
                     continue
-                inventario.stock-=producto["cantidad"]
+                
+                if cantidad is None:
+                    continue
+                
+                inventario.stock-=cantidad
                 inventario.save()
                 
                 DetalleMovimiento.objects.create(
                     movimiento=movimiento,
                     producto_id=producto["id"],
-                    cantidad=producto["cantidad"]
+                    cantidad=cantidad
                 )
                 
                 movimientoCreado+=1

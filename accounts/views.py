@@ -18,11 +18,11 @@ def validarPassword(password):
         longitud = True
         
     for letra in password:
-        if "a" < letra < "z":
+        if "a" <= letra <= "z":
             minuscula = True
-        if "A" < letra < "Z":
+        if "A" <= letra <= "Z":
             mayuscula = True
-        if "0" < letra < "9":
+        if "0" <= letra <= "9":
             numero = True
             
     if not longitud or not numero or not mayuscula or not minuscula:
@@ -73,11 +73,11 @@ class UserView(APIView):
         
         validar = validarPassword(password)
         if not validar:
-            return Response({"error","contraseña no valido"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error":"contraseña no valido"}, status=status.HTTP_400_BAD_REQUEST)
         
         user = request.user
         
-        if passActual != user.password:
+        if not user.check_password(passActual):
             return Response({"error":"contrasena actual no coincide"},status=status.HTTP_400_BAD_REQUEST)
         
         user.set_password(password)
