@@ -146,11 +146,11 @@ class InventarioView(APIView):
     def post(self, request):
         bodega = request.data.get("bodega")
         productos = request.data.get("productos")
-        fecha = request.data.get("fecha")
+        fechaEntrega = request.data.get("fechaEntrega")
         
         movimiento = Movimiento.objects.create(
             tipo="Entrada",
-            fecha=fecha,
+            fechaEntrega=fechaEntrega,
             bodega_id=bodega
         )
         

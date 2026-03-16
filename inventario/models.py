@@ -53,7 +53,8 @@ class Movimiento(models.Model):
     )
     
     tipo=models.CharField(max_length=100)
-    fecha=models.DateField(auto_now_add=True)
+    fechaEntrega=models.DateField(blank=True, null=True)
+    fechaRegistro=models.DateField(auto_now_add=True)
     bodega=models.ForeignKey(Bodega,on_delete=models.CASCADE)
 
 class DetalleMovimiento(models.Model):
