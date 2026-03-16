@@ -18,7 +18,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    "gestioninventario.pythonanywhere.com"
+    "gestioninventario.pythonanywhere.com",
     "gestioninventariofront.vercel.app"
 
 ]
