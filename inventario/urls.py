@@ -30,6 +30,7 @@ urlpatterns = [
     path('activo/producto/create/',ProductoActivoView.as_view()),
     path('activo/producto/list/',ProductoActivoView.as_view()),
     path('activo/producto/<int:id>/update/',ProductoActivoView.as_view()),
+    path('activo/producto/<int:id>/delete/',ProductoActivoView.as_view()),
     
     #movimiento
     path('movimiento/create/',MovimientoView.as_view()),

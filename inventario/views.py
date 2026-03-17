@@ -221,6 +221,20 @@ class ProductoActivoView(APIView):
             serializer.save()
             return Response(status=status.HTTP_200_OK)
     
+    def delete(self, request, id):
+        try:
+            producto = ProductoActivo.objects.get(pk=id)
+            
+        except ProductoActivo.DoesNotExist:
+            return Response({"error":"el producto no existe"},status=status.HTTP_404_NOT_FOUND)
+            
+        activo = Activo.objects.filter(activo=producto).exists()
+        if activo:
+            return Response({"error":"el producto ya esta asignado"},status=status.HTTP_400_BAD_REQUEST)
+        
+        producto.delete()
+        return Response({"mensaje":"producto eliminado"},status=status.HTTP_204_NO_CONTENT)
+    
     
 class ActivoView(APIView):
     permission_classes = [IsAuthenticated]
