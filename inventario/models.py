@@ -9,7 +9,7 @@ class Bodega(models.Model):
         return self.nombre
     
 class Producto(models.Model):
-    nombre=models.CharField(max_length=100)
+    nombre=models.CharField(unique=True, max_length=100)
     descripcion=models.TextField(blank=True,null=True)
 
     def __str__(self):
