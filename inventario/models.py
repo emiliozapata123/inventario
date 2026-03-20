@@ -1,5 +1,4 @@
 from django.db import models
-
 # Create your models here.
 
 class Bodega(models.Model):
@@ -54,7 +53,7 @@ class Movimiento(models.Model):
     
     tipo=models.CharField(max_length=100)
     fechaEntrega=models.DateField(blank=True, null=True)
-    fechaRegistro=models.DateField(auto_now_add=True)
+    fechaMovimiento=models.DateField()
     bodega=models.ForeignKey(Bodega,on_delete=models.CASCADE)
 
 class DetalleMovimiento(models.Model):

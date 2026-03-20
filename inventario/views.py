@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from .models import Bodega,Producto,Inventario,Activo,Movimiento,DetalleMovimiento,ProductoActivo
 from .serializers import BodegaSerializer,ProductoSerializer,ProductoWriteSerializer,InventarioSerializer,ActivoSerializer,DetalleMovimientoSerializer,ProductoActivoSerializer,ProductoActivoWriteSerializer,ActivoWriteSerializer
 from rest_framework.permissions import IsAuthenticated
+from django.utils import timezone
 # Create your views here.
 
 class BodegaView(APIView):
@@ -333,11 +334,17 @@ class MovimientoView(APIView):
     def post(self, request):
         productos = request.data.get("productos")
         bodega = request.data.get("bodega")
+        fechaMovimiento=request.data.get("fechaMovimiento")
         
+        if not fechaMovimiento:
+            fechaMovimiento = timezone.now().date()
+            
         movimiento = Movimiento.objects.create(
             tipo="Salida",
-            bodega_id=bodega
+            bodega_id=bodega,
+            fechaMovimiento=fechaMovimiento
         )
+        
         movimientoCreado = 0
         for producto in productos:
             cantidad = producto.get("cantidad")
