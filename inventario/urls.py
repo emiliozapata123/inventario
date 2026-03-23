@@ -26,6 +26,7 @@ urlpatterns = [
     path('activo/list/',ActivoView.as_view()),
     path('activo/<int:id>/detail/',ActivoView.as_view()),
     path('activo/<int:id>/update/',ActivoView.as_view()),
+    path('activo/<int:id>/delete/',ActivoView.as_view()),
     path('activo/resumen/',ResumenActivo.as_view()),
     path('activo/producto/create/',ProductoActivoView.as_view()),
     path('activo/producto/list/',ProductoActivoView.as_view()),

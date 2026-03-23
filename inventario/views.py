@@ -277,6 +277,17 @@ class ActivoView(APIView):
             return Response(status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    def delete(self, request, id):
+        try:
+            
+            activo = Activo.objects.get(pk=id)
+            activo.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
+        except Activo.DoesNotExist:
+            return Response({"error":"activo no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+        
+    
 class ResumenActivo(APIView):
     permission_classes = [IsAuthenticated]
     
