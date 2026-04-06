@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from django.db.models import Count
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Bodega,Producto,Inventario,Activo,Movimiento,DetalleMovimiento,ProductoActivo
-from .serializers import BodegaSerializer,ProductoSerializer,ProductoWriteSerializer,InventarioSerializer,ActivoSerializer,DetalleMovimientoSerializer,ProductoActivoSerializer,ProductoActivoWriteSerializer,ActivoWriteSerializer
+from .models import Bodega,Producto,Inventario,Activo,Movimiento,DetalleMovimiento
+from .serializers import BodegaSerializer,ProductoSerializer,ProductoWriteSerializer,InventarioSerializer,ActivoSerializer,DetalleMovimientoSerializer,ActivoWriteSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 # Create your views here.
@@ -137,14 +137,31 @@ class ProductoView(APIView):
         except Producto.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
+class InventarioActivoView(APIView):
+    def get(self, request):
+        inventario = Inventario.objects.filter(producto__tipo="Activo",stock__gt=0)
+        data = []
         
+        for inv in inventario:
+            data.append({
+                "id":inv.id,
+                "producto":inv.producto.nombre,
+                "bodega":inv.bodega.nombre,
+                "bodegaId":inv.bodega.id,
+                "cantidad":inv.stock,
+                "descripcion":inv.producto.descripcion,
+                "marca":inv.producto.marca,
+                "modelo":inv.producto.modelo
+            })
+        return Response(data, status=status.HTTP_200_OK)
+            
 class InventarioView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request, id=None):
         if id:
             try:
-                productos = Inventario.objects.filter(bodega_id=id)
+                productos = Inventario.objects.filter(bodega_id=id,producto__tipo="Consumible")
                 serializer = InventarioSerializer(productos, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Inventario.DoesNotExist:
@@ -212,41 +229,6 @@ class InventarioView(APIView):
                 
         return Response(status=status.HTTP_201_CREATED)
     
-class ProductoActivoView(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
-        productos = ProductoActivo.objects.all()
-        serializer = ProductoActivoSerializer(productos, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    def post(self, request):
-        serializer = ProductoActivoWriteSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def patch(self, request, id):
-        producto = ProductoActivo.objects.get(pk=id) 
-        serializer = ProductoActivoWriteSerializer(producto,data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_200_OK)
-    
-    def delete(self, request, id):
-        try:
-            producto = ProductoActivo.objects.get(pk=id)
-            
-        except ProductoActivo.DoesNotExist:
-            return Response({"error":"el producto no existe"},status=status.HTTP_404_NOT_FOUND)
-            
-        activo = Activo.objects.filter(activo=producto).exists()
-        if activo:
-            return Response({"error":"el producto ya esta asignado"},status=status.HTTP_400_BAD_REQUEST)
-        
-        producto.delete()
-        return Response({"mensaje":"producto eliminado"},status=status.HTTP_204_NO_CONTENT)
-    
     
 class ActivoView(APIView):
     permission_classes = [IsAuthenticated]
@@ -288,18 +270,18 @@ class ActivoView(APIView):
             return Response({"error":"activo no encontrado"}, status=status.HTTP_404_NOT_FOUND)
         
     
-class ResumenActivo(APIView):
-    permission_classes = [IsAuthenticated]
+# class ResumenActivo(APIView):
+#     permission_classes = [IsAuthenticated]
     
-    def get(self, request):
+#     def get(self, request):
 
-        equipos = (
-            Activo.objects
-            .values("activo__tipoProducto")
-            .annotate(cantidad=Count("id"))
-        )
+#         equipos = (
+#             Activo.objects
+#             .values("activo__tipoProducto")
+#             .annotate(cantidad=Count("id"))
+#         )
         
-        return Response(equipos, status=status.HTTP_200_OK)
+#         return Response(equipos, status=status.HTTP_200_OK)
                 
     
 class ResumenInventario(APIView):
@@ -348,14 +330,24 @@ class MovimientoView(APIView):
         bodega = request.data.get("bodega")
         fechaMovimiento=request.data.get("fechaMovimiento")
         
+        if not productos or not bodega:
+            return Response({"error":"faltan datos"}, status=status.HTTP_400_BAD_REQUEST)
+        
         if not fechaMovimiento:
             fechaMovimiento = timezone.now().date()
             
-        movimiento = Movimiento.objects.create(
+        movimiento = Movimiento.objects.filter(
             tipo="Salida",
             bodega_id=bodega,
             fechaMovimiento=fechaMovimiento
-        )
+        ).first()
+        
+        if not movimiento:
+            movimiento = Movimiento.objects.create(
+                tipo="Salida",
+                bodega_id=bodega,
+                fechaMovimiento=fechaMovimiento
+            )
         
         movimientoCreado = 0
         for producto in productos:
@@ -374,12 +366,17 @@ class MovimientoView(APIView):
                 inventario.stock-=cantidad
                 inventario.save()
                 
-                DetalleMovimiento.objects.create(
-                    movimiento=movimiento,
-                    producto_id=producto["id"],
-                    cantidad=cantidad
-                )
+                detalle = DetalleMovimiento.objects.filter(movimiento=movimiento,producto_id=producto["id"]).first()
                 
+                if detalle:
+                    detalle.cantidad+=cantidad
+                    detalle.save()
+                else:
+                    DetalleMovimiento.objects.create(
+                        movimiento=movimiento,
+                        producto_id=producto["id"],
+                        cantidad=cantidad
+                    )
                 movimientoCreado+=1
                 
             except Inventario.DoesNotExist:
@@ -390,6 +387,7 @@ class MovimientoView(APIView):
             return Response({"error":"no se registro el movimiento"}, status=status.HTTP_400_BAD_REQUEST)
         
         return Response(status=status.HTTP_201_CREATED)
+    
 
 class DetalleMovimientoView(APIView):
     permission_classes = [IsAuthenticated]

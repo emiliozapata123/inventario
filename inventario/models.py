@@ -8,33 +8,29 @@ class Bodega(models.Model):
         return self.nombre
     
 class Producto(models.Model):
-    nombre=models.CharField(unique=True, max_length=100)
+    TIPO_PRODUCTO=(
+        ("Activo","Activo"),
+        ("Consumible","Consumible"),
+    )
+    nombre=models.CharField(max_length=100)
     descripcion=models.TextField(blank=True,null=True)
+    tipo=models.CharField(max_length=20, choices=TIPO_PRODUCTO, default="Consumible")
+    marca=models.CharField(max_length=100, blank=True, null=True)
+    modelo=models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f"{self.nombre} - {self.descripcion}"
     
-class ProductoActivo(models.Model):
-    tipoProducto=models.CharField(max_length=100,blank=True,null=True)
-    descripcion=models.TextField(blank=True,null=True)
-    marca=models.CharField(max_length=100, blank=True,null=True)
-    modelo=models.CharField(max_length=100,blank=True,null=True)
-    
-    def __str__(self):
-        return f"{self.tipoProducto} - {self.descripcion}"
-    
 class Activo(models.Model):
-    activo=models.ForeignKey(ProductoActivo,on_delete=models.CASCADE)
+    producto=models.ForeignKey(Producto, on_delete=models.CASCADE, blank=True, null=True)
     numeroInventario=models.CharField(max_length=100, unique=True, blank=True,null=True)
     numeroSerie=models.CharField(max_length=100, blank=True, null=True)
-    fechaEntrega=models.DateField()
     ubicacion=models.CharField(max_length=100,blank=True,null=True)
     usuario=models.CharField(max_length=100,blank=True,null=True)
     cargo=models.CharField(max_length=100,blank=True,null=True)
     
     def __str__(self):
-        return f"{self.activo.tipoProducto} - {self.numeroInventario}"
-    
+        return f"{self.producto.nombre} - {self.numeroInventario}"
     
 class Inventario(models.Model):
     producto=models.ForeignKey(Producto,on_delete=models.CASCADE)
@@ -43,7 +39,7 @@ class Inventario(models.Model):
     stockMinimo=models.PositiveIntegerField(blank=True,null=True,default=0)
     
     def __str__(self):
-        return f"{self.producto}-{self.bodega}-{self.stock}"
+        return f"{self.producto.nombre}-{self.bodega}-{self.stock}"
 
 class Movimiento(models.Model):
     TIPO_MOVIMIENTO = (

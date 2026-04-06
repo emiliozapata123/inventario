@@ -1,5 +1,5 @@
 from django.urls import path,include
-from .views import BodegaView,ProductoView,InventarioView,ActivoView,DetalleMovimientoView,MovimientoView,AlertaInventario,BodegaInventario,ResumenInventario,ResumenActivo,ProductoActivoView
+from .views import BodegaView,ProductoView,InventarioView,ActivoView,DetalleMovimientoView,MovimientoView,AlertaInventario,BodegaInventario,ResumenInventario, InventarioActivoView
 
 urlpatterns = [
     #bodega 
@@ -14,12 +14,14 @@ urlpatterns = [
     path('producto/form/', ProductoView.as_view()),
     path('producto/<int:id>/update/', ProductoView.as_view()),
     path('producto/<int:id>/delete/', ProductoView.as_view()),
+    
     #inventario
     path('inventario/ingresar/producto/',InventarioView.as_view()),
     path('inventario/list/',InventarioView.as_view()),
     path('inventario/<int:id>/bodega/',InventarioView.as_view()),
     path('inventario/alert-stock/',AlertaInventario.as_view()),
     path('inventario/resumen/',ResumenInventario.as_view()),
+    path('inventario/activo/list/',InventarioActivoView.as_view()),
 
     #producto activos
     path('activo/create/',ActivoView.as_view()),
@@ -27,11 +29,11 @@ urlpatterns = [
     path('activo/<int:id>/detail/',ActivoView.as_view()),
     path('activo/<int:id>/update/',ActivoView.as_view()),
     path('activo/<int:id>/delete/',ActivoView.as_view()),
-    path('activo/resumen/',ResumenActivo.as_view()),
-    path('activo/producto/create/',ProductoActivoView.as_view()),
-    path('activo/producto/list/',ProductoActivoView.as_view()),
-    path('activo/producto/<int:id>/update/',ProductoActivoView.as_view()),
-    path('activo/producto/<int:id>/delete/',ProductoActivoView.as_view()),
+    # path('activo/resumen/',ResumenActivo.as_view()),
+    # path('activo/producto/create/',ProductoActivoView.as_view()),
+    # path('activo/producto/list/',ProductoActivoView.as_view()),
+    # path('activo/producto/<int:id>/update/',ProductoActivoView.as_view()),
+    # path('activo/producto/<int:id>/delete/',ProductoActivoView.as_view()),
     
     #movimiento
     path('movimiento/create/',MovimientoView.as_view()),

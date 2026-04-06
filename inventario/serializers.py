@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import Producto,Bodega,Inventario,Activo,Movimiento,DetalleMovimiento,ProductoActivo
-from accounts.serializers import ProfileSerializer
+from .models import Producto,Bodega,Inventario,Activo,Movimiento,DetalleMovimiento
 
 class BodegaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,18 +16,8 @@ class ProductoSerializer(serializers.ModelSerializer):
         model=Producto
         fields="__all__"
 
-class ProductoActivoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=ProductoActivo
-        fields="__all__"
-        
-class ProductoActivoWriteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=ProductoActivo
-        fields="__all__"
-        
 class ActivoSerializer(serializers.ModelSerializer):
-    activo = ProductoActivoSerializer()
+    producto = ProductoSerializer()
     class Meta:
         model=Activo
         fields="__all__"
