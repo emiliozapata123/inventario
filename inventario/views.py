@@ -6,6 +6,7 @@ from .models import Bodega,Producto,Inventario,Activo,Movimiento,DetalleMovimien
 from .serializers import BodegaSerializer,ProductoSerializer,ProductoWriteSerializer,InventarioSerializer,ActivoSerializer,DetalleMovimientoSerializer,ActivoWriteSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
+from django.db import transaction
 # Create your views here.
 
 class BodegaView(APIView):
@@ -171,6 +172,7 @@ class InventarioView(APIView):
         serializer = InventarioSerializer(inventarios, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+    @transaction.atomic
     def post(self, request):
         bodega = request.data.get("bodega")
         productos = request.data.get("productos")
@@ -226,7 +228,7 @@ class InventarioView(APIView):
                 movimientoCreado += 1
                 
         if movimientoCreado == 0:
-            return Response({"error":"no se registro el movimiento"}, status=status.HTTP_400_BAD_REQUEST)
+            raise Exception("No se creó ningún movimiento")
                 
         return Response(status=status.HTTP_201_CREATED)
     
@@ -326,6 +328,7 @@ class AlertaInventario(APIView):
 class MovimientoView(APIView):
     permission_classes = [IsAuthenticated]
     
+    @transaction.atomic
     def post(self, request):
         productos = request.data.get("productos")
         bodega = request.data.get("bodega")
@@ -384,7 +387,7 @@ class MovimientoView(APIView):
                 continue
             
         if movimientoCreado == 0:
-            return Response({"error":"no se registro el movimiento"}, status=status.HTTP_400_BAD_REQUEST)
+            raise Exception("No se creó ningún movimiento")
         
         return Response(status=status.HTTP_201_CREATED)
     
