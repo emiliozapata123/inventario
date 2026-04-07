@@ -144,7 +144,7 @@ class InventarioActivoView(APIView):
         
         for inv in inventario:
             data.append({
-                "id":inv.id,
+                "id":inv.producto.id,
                 "producto":inv.producto.nombre,
                 "bodega":inv.bodega.nombre,
                 "bodegaId":inv.bodega.id,
