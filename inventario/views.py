@@ -226,7 +226,6 @@ class InventarioView(APIView):
                 movimientoCreado += 1
                 
         if movimientoCreado == 0:
-            movimiento.delete()
             return Response({"error":"no se registro el movimiento"}, status=status.HTTP_400_BAD_REQUEST)
                 
         return Response(status=status.HTTP_201_CREATED)
@@ -385,7 +384,6 @@ class MovimientoView(APIView):
                 continue
             
         if movimientoCreado == 0:
-            movimiento.delete()
             return Response({"error":"no se registro el movimiento"}, status=status.HTTP_400_BAD_REQUEST)
         
         return Response(status=status.HTTP_201_CREATED)
