@@ -178,7 +178,7 @@ class InventarioView(APIView):
         
         movimiento = Movimiento.objects.create(
             tipo="Entrada",
-            fechaEntrega=fechaEntrega,
+            fechaEntrega=fechaEntrega if fechaEntrega else None,
             bodega_id=bodega,
             fechaMovimiento=timezone.now().date()
         )
