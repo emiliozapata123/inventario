@@ -104,17 +104,8 @@ class ProductoView(APIView):
     
     def patch(self, request, id):
         producto = Producto.objects.get(pk=id)
-        nombreProducto = request.data.get("nombre")
-        
-        try:
-            existe = Producto.objects.get(nombre=nombreProducto)
-            if existe and producto.nombre != nombreProducto:
-                return Response({"error":"el nombre del producto ya existe"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        except Producto.DoesNotExist:
-            pass
-        
         serializer = ProductoWriteSerializer(producto, data=request.data, partial=True)
+    
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
