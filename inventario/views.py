@@ -145,7 +145,8 @@ class InventarioActivoView(APIView):
         
         for inv in inventario:
             data.append({
-                "id":inv.producto.id,
+                "id":inv.id,
+                "productoId":inv.producto.id,
                 "producto":inv.producto.nombre,
                 "bodega":inv.bodega.nombre,
                 "bodegaId":inv.bodega.id,
@@ -272,20 +273,6 @@ class ActivoView(APIView):
         except Activo.DoesNotExist:
             return Response({"error":"activo no encontrado"}, status=status.HTTP_404_NOT_FOUND)
         
-    
-# class ResumenActivo(APIView):
-#     permission_classes = [IsAuthenticated]
-    
-#     def get(self, request):
-
-#         equipos = (
-#             Activo.objects
-#             .values("activo__tipoProducto")
-#             .annotate(cantidad=Count("id"))
-#         )
-        
-#         return Response(equipos, status=status.HTTP_200_OK)
-                
     
 class ResumenInventario(APIView):
     permission_classes = [IsAuthenticated]
