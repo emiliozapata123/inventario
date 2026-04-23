@@ -23,6 +23,11 @@ class ActivoSerializer(serializers.ModelSerializer):
         fields="__all__"
     
 class ActivoWriteSerializer(serializers.ModelSerializer):
+    numeroInventario = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True
+    )
     class Meta:
         model=Activo
         fields="__all__"
