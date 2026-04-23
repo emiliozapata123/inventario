@@ -238,8 +238,15 @@ class ActivoView(APIView):
             productos = Activo.objects.all()
             serializer = ActivoSerializer(productos, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-    
+        
+    @transaction.atomic
     def post(self, request):
+        invId = request.data.get("invId")
+        
+        inventario = Inventario.objects.get(pk=invId)
+        if inventario.stock <= 0:
+            return Response({"error":"inventario cantidad insuficiente"}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = ActivoWriteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
