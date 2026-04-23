@@ -32,6 +32,10 @@ class ActivoWriteSerializer(serializers.ModelSerializer):
         model=Activo
         fields="__all__"
     
+    def validate_numeroInventario(self, value):
+        if value == "":
+            return None
+        return value
     
 class InventarioSerializer(serializers.ModelSerializer):
     bodega=BodegaSerializer()
