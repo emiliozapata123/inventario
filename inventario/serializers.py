@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from accounts.serializers import ProfileSerializer
 from .models import Producto,Bodega,Inventario,Activo,Movimiento,DetalleMovimiento
 
 class BodegaSerializer(serializers.ModelSerializer):
@@ -50,6 +51,7 @@ class InventarioWriteSerializer(serializers.ModelSerializer):
         fields="__all__"
 
 class MovimientoSerializer(serializers.ModelSerializer):
+    usuario = ProfileSerializer()
     bodega = BodegaSerializer()
     class Meta:
         model=Movimiento

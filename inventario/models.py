@@ -1,4 +1,5 @@
 from django.db import models
+from accounts.models import Profile
 # Create your models here.
 
 class Bodega(models.Model):
@@ -48,6 +49,7 @@ class Movimiento(models.Model):
     )
     
     tipo=models.CharField(max_length=100)
+    usuario=models.ForeignKey(Profile, on_delete=models.CASCADE, blank=True, null=True)
     fechaEntrega=models.DateField(blank=True, null=True)
     fechaMovimiento=models.DateField()
     bodega=models.ForeignKey(Bodega,on_delete=models.CASCADE)

@@ -175,6 +175,7 @@ class InventarioView(APIView):
         movimiento = Movimiento.objects.create(
             tipo="Entrada",
             fechaEntrega=fechaEntrega,
+            usuario=request.user.profile,
             bodega_id=bodega,
             fechaMovimiento=timezone.now().date()
         )
@@ -325,19 +326,14 @@ class MovimientoView(APIView):
         if not fechaMovimiento:
             fechaMovimiento = timezone.now().date()
             
-        movimiento = Movimiento.objects.filter(
+      
+        movimiento = Movimiento.objects.create(
             tipo="Salida",
             bodega_id=bodega,
+            usuario=request.user.profile,
             fechaMovimiento=fechaMovimiento
-        ).first()
-        
-        if not movimiento:
-            movimiento = Movimiento.objects.create(
-                tipo="Salida",
-                bodega_id=bodega,
-                fechaMovimiento=fechaMovimiento
-            )
-        
+        )
+    
         movimientoCreado = 0
         for producto in productos:
             cantidad = producto.get("cantidad")
